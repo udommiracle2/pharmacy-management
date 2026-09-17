@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
-import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Medicines from './pages/Medicines';
@@ -10,13 +9,14 @@ import Sales from './pages/Sales';
 import Reports from './pages/Reports';
 import Alerts from './pages/Alerts';
 import NotFound from './pages/NotFound';
+import Register from './pages/Register';
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/register" element={<Register/>} />
+          <Route path='/register' element={<Register/>} />
           <Route path="/login" element={<Login />} />
 
           <Route
