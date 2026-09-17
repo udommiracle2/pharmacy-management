@@ -1,0 +1,69 @@
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1em;
+  margin-bottom: 2em;
+}
+
+.dashboard-columns {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1.5em;
+  align-items: start;
+}
+
+.dashboard-recent-sales {
+  padding: 1.3em 1.4em;
+}
+
+.dashboard-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8em;
+}
+
+.dashboard-section-header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.dashboard-section-header a {
+  font-size: 0.85rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.dashboard-recent-sales table th,
+.dashboard-recent-sales table td {
+  text-align: left;
+  padding: 0.55em 0.4em;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.88rem;
+}
+
+.dashboard-recent-sales table th {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: none;
+}
+
+.dashboard-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.dashboard-alerts-link {
+  text-align: center;
+}
+
+@media (max-width: 1000px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dashboard-columns {
+    grid-template-columns: 1fr;
+  }
+}

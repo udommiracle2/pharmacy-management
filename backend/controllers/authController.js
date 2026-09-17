@@ -1,0 +1,89 @@
+const asyncHandler = require('../middleware/asyncHandler');
+const User = require('../models/User');
+const generateToken = require('../utils/generateToken');
+
+// @desc    Register a new staff member
+// @route   POST /api/auth/register
+// @access  Private/Admin (or open only when no users exist yet, e.g. first setup)
+const registerStaff = asyncHandler(async (req, res) => {
+  const { name, email, password, role } = req.body;
+
+  if (!name || !email || !password) {
+    res.status(400);
+    throw new Error('Name, email and password are required');
+  }
+
+  const userCount = await User.countDocuments();
+  // Once at least one account exists, only an authenticated admin may create more staff
+  if (userCount > 0 && (!req.user || req.user.role !== 'admin')) {
+    res.status(403);
+    throw new Error('Only an admin can register new staff accounts');
+  }
+
+  const existing = await User.findOne({ email });
+  if (existing) {
+    res.status(400);
+    throw new Error('An account with that email already exists');
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    // The very first account created becomes an admin automatically
+    role: userCount === 0 ? 'admin' : role || 'pharmacist',
+  });
+
+  res.status(201).json({
+    success: true,
+    data: user.toSafeObject(),
+    token: generateToken(user._id),
+  });
+});
+
+// @desc    Staff login
+// @route   POST /api/auth/login
+// @access  Public
+const loginStaff = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400);
+    throw new Error('Email and password are required');
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user || !(await user.matchPassword(password))) {
+    res.status(401);
+    throw new Error('Invalid email or password');
+  }
+
+  if (!user.isActive) {
+    res.status(403);
+    throw new Error('This account has been deactivated');
+  }
+
+  res.json({
+    success: true,
+    data: user.toSafeObject(),
+    token: generateToken(user._id),
+  });
+});
+
+// @desc    Get the logged-in staff member's profile
+// @route   GET /api/auth/me
+// @access  Private
+const getMe = asyncHandler(async (req, res) => {
+  res.json({ success: true, data: req.user.toSafeObject() });
+});
+
+// @desc    List all staff accounts
+// @route   GET /api/auth/staff
+// @access  Private/Admin
+const listStaff = asyncHandler(async (req, res) => {
+  const staff = await User.find().select('-password').sort({ createdAt: -1 });
+  res.json({ success: true, count: staff.length, data: staff });
+});
+
+module.exports = { registerStaff, loginStaff, getMe, listStaff };
