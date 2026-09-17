@@ -1,28 +1,26 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
-export default function Login() {
-  const { login } = useAuth();
+export default function Register() {
+  const { register } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'pharmacist' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const from = location.state?.from?.pathname || '/';
+  const handleChange = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
     try {
-      await login(email, password);
-      navigate(from, { replace: true });
+      await register(form);
+      navigate('/', { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Could not log in. Check your details and try again.');
+      setError(err.response?.data?.message || 'Could not create your account. Check the fields and try again.');
     } finally {
       setSubmitting(false);
     }
@@ -33,8 +31,8 @@ export default function Login() {
       <div className="login-hero">
         <div className="login-hero-content">
           <span className="login-hero-mark">Apothecary</span>
-          <h1>Every pack, every expiry date, every sale — accounted for.</h1>
-          <p>Stock levels, expiry dates and daily sales, tracked in one place for your pharmacy counter.</p>
+          <h1>Set up your staff account in a minute.</h1>
+          <p>The first person to sign up becomes the pharmacy's admin. Everyone after that joins as staff.</p>
         </div>
         <svg className="login-hero-motif" viewBox="0 0 200 200" aria-hidden="true">
           <circle cx="40" cy="40" r="18" fill="rgba(255,255,255,0.08)" />
@@ -46,20 +44,24 @@ export default function Login() {
 
       <div className="login-form-side">
         <form className="login-form" onSubmit={handleSubmit}>
-          <h2>Staff sign in</h2>
-          <p className="login-form-sub">Use the account your pharmacy admin set up for you.</p>
+          <h2>Create your account</h2>
+          <p className="login-form-sub">Set up staff access for the pharmacy.</p>
 
           {error && <p className="error-text">{error}</p>}
+
+          <div className="field">
+            <label htmlFor="name">Full name</label>
+            <input id="name" value={form.name} onChange={handleChange('name')} required autoFocus />
+          </div>
 
           <div className="field">
             <label htmlFor="email">Email address</label>
             <input
               id="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={form.email}
+              onChange={handleChange('email')}
               required
-              autoFocus
               autoComplete="username"
             />
           </div>
@@ -69,20 +71,29 @@ export default function Login() {
             <input
               id="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={form.password}
+              onChange={handleChange('password')}
               required
-              autoComplete="current-password"
+              minLength={6}
+              autoComplete="new-password"
             />
           </div>
 
+          <div className="field">
+            <label htmlFor="role">Your role</label>
+            <select id="role" value={form.role} onChange={handleChange('role')}>
+              <option value="pharmacist">Pharmacist</option>
+              <option value="cashier">Cashier</option>
+            </select>
+          </div>
+
           <button className="btn btn-primary login-submit" type="submit" disabled={submitting}>
-            {submitting ? 'Signing in…' : 'Sign in'}
+            {submitting ? 'Creating account…' : 'Create account'}
           </button>
 
-            <p className="login-hint">
-              New here? <Link to="/register">Create a staff account</Link>.
-            </p>
+          <p className="login-hint">
+            Already have an account? <Link to="/login">Sign in instead</Link>.
+          </p>
         </form>
       </div>
     </div>

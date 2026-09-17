@@ -38,6 +38,18 @@ export function AuthProvider({ children }) {
     return res.data.data;
   };
 
+    // Self-service sign-up. The backend decides the actual role: the very
+    // first account for a fresh pharmacy becomes admin automatically; every
+    // account after that is limited to whatever `role` is passed here
+    // (pharmacist/cashier) regardless of what's requested.
+    const register = async ({ name, email, password, role }) => {
+      const res = await api.post('/auth/register', { name, email, password, role });
+      localStorage.setItem('pharmacy_token', res.data.token);
+      localStorage.setItem('pharmacy_user', JSON.stringify(res.data.data));
+      setUser(res.data.data);
+      return res.data.data;
+    };
+  
   const logout = () => {
     localStorage.removeItem('pharmacy_token');
     localStorage.removeItem('pharmacy_user');
@@ -45,7 +57,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
