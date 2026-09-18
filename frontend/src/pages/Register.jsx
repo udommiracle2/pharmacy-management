@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-//import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import './Login.css';
-import api from '../api/axios';
 
 
 export default function Register() {
-  // const { register } = useAuth();
-  //useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'pharmacist' });
   const [error, setError] = useState('');
