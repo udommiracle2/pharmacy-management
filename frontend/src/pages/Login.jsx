@@ -126,7 +126,7 @@ export default function Login() {
 
   return (
     <div className="login-screen">
-      <div className="login-hero">
+      {/* <div className="login-hero">
         <div className="login-hero-content">
           <span className="login-hero-mark">Apothecary</span>
           <h1>Every pack, every expiry date, every sale — accounted for.</h1>
@@ -138,7 +138,7 @@ export default function Login() {
           <circle cx="90" cy="150" r="22" fill="rgba(255,255,255,0.07)" />
           <circle cx="170" cy="170" r="12" fill="rgba(255,255,255,0.09)" />
         </svg>
-      </div>
+      </div> */}
 
       <div className="login-form-side">
         <form className="login-form" onSubmit={handleSubmit}>
