@@ -29,7 +29,7 @@ export default function Register() {
 
   return (
     <div className="login-screen">
-      <div className="login-hero">
+      {/* <div className="login-hero">
         <div className="login-hero-content">
           <span className="login-hero-mark">Apothecary</span>
           <h1>Set up your pharmacy in a minute.</h1>
@@ -41,11 +41,11 @@ export default function Register() {
           <circle cx="90" cy="150" r="22" fill="rgba(255,255,255,0.07)" />
           <circle cx="170" cy="170" r="12" fill="rgba(255,255,255,0.09)" />
         </svg>
-      </div>
+      </div> */}
 
       <div className="login-form-side">
         <form className="login-form" onSubmit={handleSubmit}>
-          <h2>Create your account</h2>
+          <h2>THE PHARM</h2>
           <p className="login-form-sub">Set up your own pharmacy in a few seconds.</p>
 
           {error && <p className="error-text">{error}</p>}

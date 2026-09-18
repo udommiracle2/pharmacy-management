@@ -40,7 +40,7 @@ export default function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-brand">
         <div className="sidebar-brand-text">
-          <span className="sidebar-brand-mark">Apothecary</span>
+          <span className="sidebar-brand-mark">THE PHARM</span>
           <span className="sidebar-brand-sub">Inventory & sales</span>
         </div>
         <button
