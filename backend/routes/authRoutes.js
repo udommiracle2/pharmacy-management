@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerStaff, loginStaff, getMe, listStaff } = require('../controllers/authController');
+const { registerStaff, loginStaff, getMe, listStaff, deleteAccount } = require('../controllers/authController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -14,6 +14,7 @@ router.post('/register', (req, res, next) => {
   next();
 }, registerStaff);
 router.get('/me', protect, getMe);
+router.delete('/me', protect, deleteAccount);
 router.get('/staff', protect, authorize('admin'), listStaff);
 
 module.exports = router;

@@ -172,6 +172,14 @@ code,
 }
 .field-row .field {
   flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .field-row {
+    flex-direction: column;
+    gap: 0;
+  }
 }
 
 .badge {
@@ -211,4 +219,14 @@ code,
   text-align: center;
   color: var(--color-text-muted);
   padding: 3em 1em;
+}
+
+/* Reusable horizontal-scroll wrapper for any table that might not fit on
+   a narrow screen, instead of squeezing columns or overflowing the page. */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll table {
+  min-width: 480px;
 }

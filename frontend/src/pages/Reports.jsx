@@ -91,24 +91,26 @@ export default function Reports() {
               {salesReport.topSellers.length === 0 ? (
                 <p className="empty-state">No sales in this date range.</p>
               ) : (
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Medicine</th>
-                      <th>Units sold</th>
-                      <th>Revenue</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {salesReport.topSellers.map((s) => (
-                      <tr key={s._id}>
-                        <td>{s.name}</td>
-                        <td>{s.quantitySold}</td>
-                        <td>{formatCurrency(s.revenue)}</td>
+                <div className="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Medicine</th>
+                        <th>Units sold</th>
+                        <th>Revenue</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {salesReport.topSellers.map((s) => (
+                        <tr key={s._id}>
+                          <td>{s.name}</td>
+                          <td>{s.quantitySold}</td>
+                          <td>{formatCurrency(s.revenue)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
 
@@ -117,26 +119,28 @@ export default function Reports() {
               <p className="reports-total-stock">
                 Total stock value: <strong>{formatCurrency(stockReport.totalStockValue)}</strong>
               </p>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Category</th>
-                    <th>Items</th>
-                    <th>Units</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stockReport.byCategory.map((c) => (
-                    <tr key={c.category}>
-                      <td>{c.category}</td>
-                      <td>{c.itemCount}</td>
-                      <td>{c.totalUnits}</td>
-                      <td>{formatCurrency(c.stockValue)}</td>
+              <div className="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Items</th>
+                      <th>Units</th>
+                      <th>Value</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {stockReport.byCategory.map((c) => (
+                      <tr key={c.category}>
+                        <td>{c.category}</td>
+                        <td>{c.itemCount}</td>
+                        <td>{c.totalUnits}</td>
+                        <td>{formatCurrency(c.stockValue)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </>

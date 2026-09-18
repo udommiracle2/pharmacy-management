@@ -73,26 +73,28 @@ export default function Dashboard() {
           {recentSales.length === 0 ? (
             <p className="empty-state">No sales recorded yet. Head to the Sales page to log one.</p>
           ) : (
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Items</th>
-                  <th>Customer</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentSales.map((sale) => (
-                  <tr key={sale._id}>
-                    <td>{formatDate(sale.createdAt, true)}</td>
-                    <td>{sale.items.length} item(s)</td>
-                    <td>{sale.customerName}</td>
-                    <td>{formatCurrency(sale.totalAmount)}</td>
+            <div className="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Customer</th>
+                    <th>Total</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {recentSales.map((sale) => (
+                    <tr key={sale._id}>
+                      <td>{formatDate(sale.createdAt, true)}</td>
+                      <td>{sale.items.length} item(s)</td>
+                      <td>{sale.customerName}</td>
+                      <td>{formatCurrency(sale.totalAmount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 

@@ -101,6 +101,8 @@
 
 const asyncHandler = require('../middleware/asyncHandler');
 const User = require('../models/User');
+const Medicine = require('../models/Medicine');
+const Sale = require('../models/Sale');
 const generateToken = require('../utils/generateToken');
 
 // Roles a logged-in admin may assign when inviting a staff member into
@@ -208,4 +210,31 @@ const listStaff = asyncHandler(async (req, res) => {
   res.json({ success: true, count: staff.length, data: staff });
 });
 
-module.exports = { registerStaff, loginStaff, getMe, listStaff };
+// @desc    Delete the logged-in user's account.
+//            - If this account is the pharmacy's admin (the tenant root),
+//              this permanently deletes the whole pharmacy: every staff
+//              account, every medicine and every sale tied to it.
+//            - If this account is a staff member, only that one account
+//              is removed; the pharmacy's data and other staff are
+//              untouched.
+//          Irreversible.
+// @route   DELETE /api/auth/me
+// @access  Private
+const deleteAccount = asyncHandler(async (req, res) => {
+  const isTenantRoot = req.user.role === 'admin';
+
+  if (isTenantRoot) {
+    const tenantId = req.user.tenantId;
+    await Promise.all([
+      User.deleteMany({ tenantId }),
+      Medicine.deleteMany({ tenantId }),
+      Sale.deleteMany({ tenantId }),
+    ]);
+  } else {
+    await User.deleteOne({ _id: req.user._id });
+  }
+
+  res.json({ success: true, data: { deletedWholePharmacy: isTenantRoot } });
+});
+
+module.exports = { registerStaff, loginStaff, getMe, listStaff, deleteAccount };

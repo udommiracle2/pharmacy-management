@@ -145,32 +145,34 @@ export default function Sales() {
           </button>
 
           {cart.length > 0 && (
-            <table className="sales-cart-table">
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Qty</th>
-                  <th>Subtotal</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {cart.map((item) => (
-                  <tr key={item.medicineId}>
-                    <td>{item.name}</td>
-                    <td>
-                      {item.quantity} {item.unit}(s)
-                    </td>
-                    <td>{formatCurrency(item.unitPrice * item.quantity)}</td>
-                    <td>
-                      <button className="sales-remove" onClick={() => removeFromCart(item.medicineId)}>
-                        Remove
-                      </button>
-                    </td>
+            <div className="table-scroll">
+              <table className="sales-cart-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Subtotal</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {cart.map((item) => (
+                    <tr key={item.medicineId}>
+                      <td>{item.name}</td>
+                      <td>
+                        {item.quantity} {item.unit}(s)
+                      </td>
+                      <td>{formatCurrency(item.unitPrice * item.quantity)}</td>
+                      <td>
+                        <button className="sales-remove" onClick={() => removeFromCart(item.medicineId)}>
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
 
           <div className="sales-total">
@@ -213,28 +215,30 @@ export default function Sales() {
           {sales.length === 0 ? (
             <p className="empty-state">No sales recorded yet.</p>
           ) : (
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Items</th>
-                  <th>Customer</th>
-                  <th>Payment</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sales.map((sale) => (
-                  <tr key={sale._id}>
-                    <td>{formatDate(sale.createdAt, true)}</td>
-                    <td>{sale.items.map((i) => `${i.name} ×${i.quantity}`).join(', ')}</td>
-                    <td>{sale.customerName}</td>
-                    <td style={{ textTransform: 'capitalize' }}>{sale.paymentMethod}</td>
-                    <td>{formatCurrency(sale.totalAmount)}</td>
+            <div className="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Customer</th>
+                    <th>Payment</th>
+                    <th>Total</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {sales.map((sale) => (
+                    <tr key={sale._id}>
+                      <td>{formatDate(sale.createdAt, true)}</td>
+                      <td>{sale.items.map((i) => `${i.name} ×${i.quantity}`).join(', ')}</td>
+                      <td>{sale.customerName}</td>
+                      <td style={{ textTransform: 'capitalize' }}>{sale.paymentMethod}</td>
+                      <td>{formatCurrency(sale.totalAmount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
