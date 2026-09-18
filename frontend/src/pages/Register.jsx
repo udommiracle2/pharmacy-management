@@ -7,7 +7,7 @@ import api from '../api/axios';
 
 export default function Register() {
   // const { register } = useAuth();
-  useAuth();
+  //useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'pharmacist' });
   const [error, setError] = useState('');
