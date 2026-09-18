@@ -9,11 +9,13 @@ const getSummary = asyncHandler(async (req, res) => {
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
 
+  const tenantId = req.user.tenantId;
+
   const [totalMedicines, medicines, todaySales, lowStockCount] = await Promise.all([
-    Medicine.countDocuments(),
-    Medicine.find(),
-    Sale.find({ createdAt: { $gte: startOfToday } }),
-    Medicine.countDocuments({ $expr: { $lte: ['$quantityInStock', '$reorderLevel'] } }),
+    Medicine.countDocuments({ tenantId }),
+    Medicine.find({ tenantId }),
+    Sale.find({ tenantId, createdAt: { $gte: startOfToday } }),
+    Medicine.countDocuments({ tenantId, $expr: { $lte: ['$quantityInStock', '$reorderLevel'] } }),
   ]);
 
   const now = new Date();
@@ -47,7 +49,7 @@ const getSummary = asyncHandler(async (req, res) => {
 // @access  Private
 const getSalesReport = asyncHandler(async (req, res) => {
   const { from, to } = req.query;
-  const match = {};
+  const match = { tenantId: req.user.tenantId };
   if (from || to) {
     match.createdAt = {};
     if (from) match.createdAt.$gte = new Date(from);
@@ -94,7 +96,7 @@ const getSalesReport = asyncHandler(async (req, res) => {
 // @route   GET /api/reports/stock
 // @access  Private
 const getStockReport = asyncHandler(async (req, res) => {
-  const medicines = await Medicine.find().sort({ category: 1, name: 1 });
+  const medicines = await Medicine.find({ tenantId: req.user.tenantId }).sort({ category: 1, name: 1 });
 
   const byCategory = {};
   for (const m of medicines) {

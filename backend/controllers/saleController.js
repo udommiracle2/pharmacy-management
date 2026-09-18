@@ -22,7 +22,7 @@ const createSale = asyncHandler(async (req, res) => {
       throw new Error('Each sale item needs a medicine id and a quantity of at least 1');
     }
 
-    const medicine = await Medicine.findById(item.medicine);
+    const medicine = await Medicine.findOne({ _id: item.medicine, tenantId: req.user.tenantId });
     if (!medicine) {
       res.status(404);
       throw new Error(`Medicine not found: ${item.medicine}`);
@@ -64,6 +64,7 @@ const createSale = asyncHandler(async (req, res) => {
     customerName,
     paymentMethod,
     soldBy: req.user._id,
+    tenantId: req.user.tenantId,
   });
 
   res.status(201).json({ success: true, data: sale });
@@ -74,7 +75,7 @@ const createSale = asyncHandler(async (req, res) => {
 // @access  Private
 const getSales = asyncHandler(async (req, res) => {
   const { from, to } = req.query;
-  const query = {};
+  const query = { tenantId: req.user.tenantId };
 
   if (from || to) {
     query.createdAt = {};
@@ -93,7 +94,10 @@ const getSales = asyncHandler(async (req, res) => {
 // @route   GET /api/sales/:id
 // @access  Private
 const getSaleById = asyncHandler(async (req, res) => {
-  const sale = await Sale.findById(req.params.id).populate('soldBy', 'name email');
+  const sale = await Sale.findOne({ _id: req.params.id, tenantId: req.user.tenantId }).populate(
+    'soldBy',
+    'name email'
+  );
   if (!sale) {
     res.status(404);
     throw new Error('Sale not found');

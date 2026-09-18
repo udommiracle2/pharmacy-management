@@ -7,7 +7,7 @@ import './Login.css';
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'pharmacist' });
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -32,8 +32,8 @@ export default function Register() {
       <div className="login-hero">
         <div className="login-hero-content">
           <span className="login-hero-mark">Apothecary</span>
-          <h1>Set up your staff account in a minute.</h1>
-          <p>The first person to sign up becomes the pharmacy's admin. Everyone after that joins as staff.</p>
+          <h1>Set up your pharmacy in a minute.</h1>
+          <p>Signing up creates your own pharmacy account, separate from everyone else's. You'll be its admin.</p>
         </div>
         <svg className="login-hero-motif" viewBox="0 0 200 200" aria-hidden="true">
           <circle cx="40" cy="40" r="18" fill="rgba(255,255,255,0.08)" />
@@ -46,7 +46,7 @@ export default function Register() {
       <div className="login-form-side">
         <form className="login-form" onSubmit={handleSubmit}>
           <h2>Create your account</h2>
-          <p className="login-form-sub">Set up staff access for the pharmacy.</p>
+          <p className="login-form-sub">Set up your own pharmacy in a few seconds.</p>
 
           {error && <p className="error-text">{error}</p>}
 
@@ -78,14 +78,6 @@ export default function Register() {
               minLength={6}
               autoComplete="new-password"
             />
-          </div>
-
-          <div className="field">
-            <label htmlFor="role">Your role</label>
-            <select id="role" value={form.role} onChange={handleChange('role')}>
-              <option value="pharmacist">Pharmacist</option>
-              <option value="cashier">Cashier</option>
-            </select>
           </div>
 
           <button className="btn btn-primary login-submit" type="submit" disabled={submitting}>

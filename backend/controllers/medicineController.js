@@ -8,7 +8,7 @@ const EXPIRY_WARNING_DAYS = Number(process.env.EXPIRY_WARNING_DAYS) || 30;
 // @access  Private
 const getMedicines = asyncHandler(async (req, res) => {
   const { q, category, filter } = req.query;
-  const query = {};
+  const query = { tenantId: req.user.tenantId };
 
   if (q) {
     query.$or = [
@@ -44,7 +44,7 @@ const getMedicines = asyncHandler(async (req, res) => {
 // @route   GET /api/medicines/:id
 // @access  Private
 const getMedicineById = asyncHandler(async (req, res) => {
-  const medicine = await Medicine.findById(req.params.id);
+  const medicine = await Medicine.findOne({ _id: req.params.id, tenantId: req.user.tenantId });
   if (!medicine) {
     res.status(404);
     throw new Error('Medicine not found');
@@ -56,7 +56,11 @@ const getMedicineById = asyncHandler(async (req, res) => {
 // @route   POST /api/medicines
 // @access  Private
 const createMedicine = asyncHandler(async (req, res) => {
-  const medicine = await Medicine.create({ ...req.body, createdBy: req.user._id });
+  const medicine = await Medicine.create({
+    ...req.body,
+    createdBy: req.user._id,
+    tenantId: req.user.tenantId,
+  });
   res.status(201).json({ success: true, data: medicine });
 });
 
@@ -64,13 +68,15 @@ const createMedicine = asyncHandler(async (req, res) => {
 // @route   PUT /api/medicines/:id
 // @access  Private
 const updateMedicine = asyncHandler(async (req, res) => {
-  const medicine = await Medicine.findById(req.params.id);
+  const medicine = await Medicine.findOne({ _id: req.params.id, tenantId: req.user.tenantId });
   if (!medicine) {
     res.status(404);
     throw new Error('Medicine not found');
   }
 
-  Object.assign(medicine, req.body);
+  // Never let the request body move a medicine into a different pharmacy.
+  const { tenantId, ...updates } = req.body;
+  Object.assign(medicine, updates);
   await medicine.save();
 
   res.json({ success: true, data: medicine });
@@ -80,7 +86,7 @@ const updateMedicine = asyncHandler(async (req, res) => {
 // @route   DELETE /api/medicines/:id
 // @access  Private
 const deleteMedicine = asyncHandler(async (req, res) => {
-  const medicine = await Medicine.findById(req.params.id);
+  const medicine = await Medicine.findOne({ _id: req.params.id, tenantId: req.user.tenantId });
   if (!medicine) {
     res.status(404);
     throw new Error('Medicine not found');
@@ -95,6 +101,7 @@ const deleteMedicine = asyncHandler(async (req, res) => {
 // @access  Private
 const getLowStockAlerts = asyncHandler(async (req, res) => {
   const medicines = await Medicine.find({
+    tenantId: req.user.tenantId,
     $expr: { $lte: ['$quantityInStock', '$reorderLevel'] },
   }).sort({ quantityInStock: 1 });
 
@@ -110,7 +117,10 @@ const getExpiryAlerts = asyncHandler(async (req, res) => {
   const warningDate = new Date();
   warningDate.setDate(now.getDate() + days);
 
-  const medicines = await Medicine.find({ expiryDate: { $lte: warningDate } }).sort({ expiryDate: 1 });
+  const medicines = await Medicine.find({
+    tenantId: req.user.tenantId,
+    expiryDate: { $lte: warningDate },
+  }).sort({ expiryDate: 1 });
 
   const data = medicines.map((m) => ({
     ...m.toObject(),
