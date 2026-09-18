@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema(
       default: 'pharmacist',
     },
     isActive: { type: Boolean, default: true },
+    // Identifies which pharmacy's data this account can see. An admin who
+    // self-registers is the root of their own pharmacy, so their tenantId
+    // is their own _id. A staff member invited by an admin inherits that
+    // admin's tenantId, so they share the same pharmacy's data.
+    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );
@@ -40,6 +45,7 @@ userSchema.methods.toSafeObject = function () {
     email: this.email,
     role: this.role,
     isActive: this.isActive,
+    tenantId: this.tenantId,
   };
 };
 

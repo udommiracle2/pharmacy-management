@@ -38,8 +38,8 @@ export function AuthProvider({ children }) {
     return res.data.data;
   };
 
-  const register = async ({ name, email, password, role }) => {
-    const res = await api.post('/auth/register', { name, email, password, role });
+  const register = async ({ name, email, password }) => {
+    const res = await api.post('/auth/register', { name, email, password });
     localStorage.setItem('pharmacy_token', res.data.token);
     localStorage.setItem('pharmacy_user', JSON.stringify(res.data.data));
     setUser(res.data.data);

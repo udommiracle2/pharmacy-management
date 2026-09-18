@@ -103,19 +103,20 @@ const asyncHandler = require('../middleware/asyncHandler');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
-// Roles a staff member is allowed to pick for themselves at self-service sign-up.
-// "admin" is deliberately excluded here — it can only be granted by an existing
-// admin (see the role-resolution logic below), or claimed automatically by the
-// very first account created for a fresh pharmacy.
+// Roles a logged-in admin may assign when inviting a staff member into
+// their own pharmacy. "admin" is excluded — that can only be claimed by
+// self-registering (which starts a brand new, independent pharmacy).
 const SELF_SERVICE_ROLES = ['pharmacist', 'cashier'];
 
-// @desc    Register a new staff member. Open to anyone (self-service sign-up
-//          for staff), but the role that gets assigned depends on context:
-//            - the very first account ever created becomes admin automatically
-//            - a logged-in admin creating an account may set any role, including admin
-//            - anyone else registering themselves may only pick pharmacist/cashier
+// @desc    Register an account. What happens depends on context:
+//            - anyone signing up on the public form starts a brand new,
+//              independent pharmacy and becomes its admin automatically
+//              (their tenantId is their own _id)
+//            - a logged-in admin may instead use this route to invite a
+//              staff member into their *own* pharmacy; that staff member
+//              inherits the admin's tenantId and role (pharmacist/cashier)
 // @route   POST /api/auth/register
-// @access  Public
+// @access  Public (self sign-up) / Private-Admin (inviting staff)
 const registerStaff = asyncHandler(async (req, res) => {
   const { name, email, password, role } = req.body;
 
@@ -129,24 +130,29 @@ const registerStaff = asyncHandler(async (req, res) => {
     throw new Error('Password must be at least 6 characters');
   }
 
-  const userCount = await User.countDocuments();
-
-  let assignedRole;
-  if (userCount === 0) {
-    assignedRole = 'admin';
-  } else if (req.user && req.user.role === 'admin') {
-    assignedRole = role || 'pharmacist';
-  } else {
-    assignedRole = SELF_SERVICE_ROLES.includes(role) ? role : 'pharmacist';
-  }
-
   const existing = await User.findOne({ email });
   if (existing) {
     res.status(400);
     throw new Error('An account with that email already exists');
   }
 
-  const user = await User.create({ name, email, password, role: assignedRole });
+  const invitingAdmin = req.user && req.user.role === 'admin' ? req.user : null;
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role: invitingAdmin ? (SELF_SERVICE_ROLES.includes(role) ? role : 'pharmacist') : 'admin',
+    // Staff invited by an admin join that admin's pharmacy. Anyone signing
+    // up on their own starts a new pharmacy, so they are their own tenant
+    // root — filled in just below once we know their own _id.
+    tenantId: invitingAdmin ? invitingAdmin.tenantId : undefined,
+  });
+
+  if (!invitingAdmin) {
+    user.tenantId = user._id;
+    await user.save();
+  }
 
   res.status(201).json({
     success: true,
@@ -196,7 +202,9 @@ const getMe = asyncHandler(async (req, res) => {
 // @route   GET /api/auth/staff
 // @access  Private/Admin
 const listStaff = asyncHandler(async (req, res) => {
-  const staff = await User.find().select('-password').sort({ createdAt: -1 });
+  const staff = await User.find({ tenantId: req.user.tenantId })
+    .select('-password')
+    .sort({ createdAt: -1 });
   res.json({ success: true, count: staff.length, data: staff });
 });
 

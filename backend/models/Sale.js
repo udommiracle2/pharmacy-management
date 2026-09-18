@@ -22,6 +22,8 @@ const saleSchema = new mongoose.Schema(
       default: 'cash',
     },
     soldBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    // Scopes this sale to one pharmacy, same as Medicine.tenantId.
+    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   },
   { timestamps: true }
 );
